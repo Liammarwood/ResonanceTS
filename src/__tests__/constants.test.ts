@@ -2,11 +2,15 @@ import { describe, it, expect } from 'vitest';
 import { CONSTANTS } from '../constants';
 
 describe('CONSTANTS', () => {
-  it('has exactly 8 ring segments', () => {
-    expect(CONSTANTS.RING_SEGMENTS).toBe(8);
+  it('has max 16 ring segments', () => {
+    expect(CONSTANTS.RING_SEGMENTS).toBe(16);
   });
 
-  it('has exactly 8 segment colors matching RING_SEGMENTS', () => {
+  it('has initial 4 ring segments', () => {
+    expect(CONSTANTS.INITIAL_RING_SEGMENTS).toBe(4);
+  });
+
+  it('has exactly 16 segment colors matching RING_SEGMENTS', () => {
     expect(CONSTANTS.SEGMENT_COLORS).toHaveLength(CONSTANTS.RING_SEGMENTS);
   });
 
@@ -17,8 +21,8 @@ describe('CONSTANTS', () => {
     }
   });
 
-  it('ROTATION_STEP equals one full circle divided by segment count', () => {
-    expect(CONSTANTS.ROTATION_STEP).toBeCloseTo((Math.PI * 2) / CONSTANTS.RING_SEGMENTS);
+  it('initial segment count is less than max segment count', () => {
+    expect(CONSTANTS.INITIAL_RING_SEGMENTS).toBeLessThan(CONSTANTS.RING_SEGMENTS);
   });
 
   it('difficulty bounds are self-consistent', () => {

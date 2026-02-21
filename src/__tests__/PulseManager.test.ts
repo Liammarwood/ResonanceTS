@@ -24,6 +24,16 @@ describe('PulseManager', () => {
     expect(CONSTANTS.SEGMENT_COLORS).toContain(pulse.color);
   });
 
+  it('setSegments() limits pulse colors to the active segment range', () => {
+    pm.setSegments(4);
+    for (let i = 0; i < 20; i++) pm.spawn();
+    const pulses = pm.getActivePulses();
+    const allowedColors = CONSTANTS.SEGMENT_COLORS.slice(0, 4);
+    for (const p of pulses) {
+      expect(allowedColors).toContain(p.color);
+    }
+  });
+
   it('removeActive() deactivates and removes the pulse from the list', () => {
     pm.spawn();
     const pulse = pm.getActivePulses()[0];

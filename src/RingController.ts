@@ -5,16 +5,25 @@ export class RingController {
   private targetRotation: number = 0;
   private animStartRotation: number = 0;
   private animProgress: number = 1;
+  private segments: number = CONSTANTS.INITIAL_RING_SEGMENTS;
 
   reset(): void {
     this.rotation = 0;
     this.targetRotation = 0;
     this.animProgress = 1;
+    this.segments = CONSTANTS.INITIAL_RING_SEGMENTS;
   }
 
+  setSegments(count: number): void {
+    this.segments = Math.max(1, Math.min(count, CONSTANTS.RING_SEGMENTS));
+  }
+
+  getSegments(): number { return this.segments; }
+
   rotate(direction: 1 | -1): void {
+    const step = (Math.PI * 2) / this.segments;
     this.animStartRotation = this.rotation;
-    this.targetRotation += direction * CONSTANTS.ROTATION_STEP;
+    this.targetRotation += direction * step;
     this.animProgress = 0;
   }
 
@@ -28,16 +37,16 @@ export class RingController {
 
   getRotation(): number { return this.rotation; }
 
-  // Returns segment index (0-7) for a given world angle
+  // Returns segment index for a given world angle
   getSegmentAtAngle(angle: number): number {
-    const segAngle = (Math.PI * 2) / CONSTANTS.RING_SEGMENTS;
+    const segAngle = (Math.PI * 2) / this.segments;
     // Normalize angle relative to ring rotation
     const normalized = ((angle - this.rotation) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
-    return Math.floor(normalized / segAngle) % CONSTANTS.RING_SEGMENTS;
+    return Math.floor(normalized / segAngle) % this.segments;
   }
 
   getSegmentColor(index: number): string {
-    return CONSTANTS.SEGMENT_COLORS[index % CONSTANTS.RING_SEGMENTS];
+    return CONSTANTS.SEGMENT_COLORS[index % this.segments];
   }
 }
 

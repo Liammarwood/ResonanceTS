@@ -4,6 +4,7 @@ import { RingController } from './RingController';
 import { PulseManager } from './PulseManager';
 import { InputManager } from './InputManager';
 import { ScoreManager } from './ScoreManager';
+import { LevelManager } from './LevelManager';
 import { Renderer } from './Renderer';
 
 export class Game {
@@ -12,6 +13,7 @@ export class Game {
   private pulseManager: PulseManager;
   private inputManager: InputManager;
   private scoreManager: ScoreManager;
+  private levelManager: LevelManager;
   private renderer: Renderer;
   private lastTime: number = 0;
   private canvas: HTMLCanvasElement;
@@ -22,6 +24,7 @@ export class Game {
     this.ring = new RingController();
     this.pulseManager = new PulseManager();
     this.scoreManager = new ScoreManager();
+    this.levelManager = new LevelManager();
     this.renderer = new Renderer(canvas);
     this.inputManager = new InputManager(canvas);
 
@@ -57,6 +60,7 @@ export class Game {
     this.ring.reset();
     this.pulseManager.reset();
     this.scoreManager.reset();
+    this.levelManager.reset();
     this.stateManager.transition('playing');
   }
 
@@ -99,6 +103,17 @@ export class Game {
         this.renderer.spawnParticles(hit.x, hit.y, hit.color);
         this.playAbsorbSound();
         this.pulseManager.removeActive(hit);
+
+        // Level-up check (loop to handle multi-level jumps)
+        const score = this.scoreManager.getScore();
+        while (this.levelManager.checkLevelUp(score)) {
+          const segCount = this.levelManager.getSegmentCount();
+          this.ring.setSegments(segCount);
+          this.pulseManager.setSegments(segCount);
+          const newSpeed = CONSTANTS.INITIAL_PULSE_SPEED + this.levelManager.getLevelSpeedBoost();
+          this.pulseManager.setBaseSpeed(newSpeed);
+          this.renderer.triggerLevelUp(this.levelManager.getLevel());
+        }
       } else {
         // Wrong match - game over
         this.stateManager.transition('gameover');
@@ -115,6 +130,7 @@ export class Game {
       this.scoreManager.getScore(),
       this.scoreManager.getCombo(),
       this.scoreManager.getHighScore(),
+      this.levelManager.getLevel(),
     );
   }
 

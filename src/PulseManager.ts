@@ -8,6 +8,7 @@ export class PulseManager {
   private difficultyTimer: number = 0;
   private currentSpeed: number = CONSTANTS.INITIAL_PULSE_SPEED;
   private currentInterval: number = CONSTANTS.INITIAL_SPAWN_INTERVAL;
+  private currentSegments: number = CONSTANTS.INITIAL_RING_SEGMENTS;
 
   constructor(poolSize: number = 30) {
     for (let i = 0; i < poolSize; i++) {
@@ -22,6 +23,15 @@ export class PulseManager {
     this.difficultyTimer = 0;
     this.currentSpeed = CONSTANTS.INITIAL_PULSE_SPEED;
     this.currentInterval = CONSTANTS.INITIAL_SPAWN_INTERVAL;
+    this.currentSegments = CONSTANTS.INITIAL_RING_SEGMENTS;
+  }
+
+  setSegments(count: number): void {
+    this.currentSegments = Math.max(1, Math.min(count, CONSTANTS.RING_SEGMENTS));
+  }
+
+  setBaseSpeed(speed: number): void {
+    this.currentSpeed = Math.min(CONSTANTS.MAX_PULSE_SPEED, speed);
   }
 
   private acquire(): Pulse {
@@ -35,7 +45,7 @@ export class PulseManager {
 
   spawn(): void {
     const angle = Math.random() * Math.PI * 2;
-    const colorIndex = Math.floor(Math.random() * CONSTANTS.RING_SEGMENTS);
+    const colorIndex = Math.floor(Math.random() * this.currentSegments);
     const color = CONSTANTS.SEGMENT_COLORS[colorIndex];
     const p = this.acquire();
     p.init(angle, color, this.currentSpeed);
