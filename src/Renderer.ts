@@ -18,6 +18,8 @@ export class Renderer {
   private ctx: CanvasRenderingContext2D;
   private canvas: HTMLCanvasElement;
   private particles: Particle[] = [];
+  private levelUpFlash: number = 0;   // ms remaining for level-up overlay
+  private levelUpNumber: number = 1;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -27,6 +29,11 @@ export class Renderer {
   resize(width: number, height: number): void {
     this.canvas.width = width;
     this.canvas.height = height;
+  }
+
+  triggerLevelUp(level: number): void {
+    this.levelUpFlash = 900;
+    this.levelUpNumber = level;
   }
 
   spawnParticles(x: number, y: number, color: string): void {
@@ -46,6 +53,7 @@ export class Renderer {
   }
 
   update(dt: number): void {
+    this.levelUpFlash = Math.max(0, this.levelUpFlash - dt * 1000);
     this.particles = this.particles.filter(p => {
       p.life -= dt * 1000;
       p.x += p.vx * dt;
@@ -63,6 +71,7 @@ export class Renderer {
     score: number,
     combo: number,
     highScore: number,
+    level: number,
   ): void {
     const { ctx, canvas } = this;
     const w = canvas.width, h = canvas.height;
@@ -91,7 +100,12 @@ export class Renderer {
     this.drawParticles();
 
     // Draw UI
-    this.drawScore(score, combo, w);
+    this.drawScore(score, combo, level, w);
+
+    // Level-up flash
+    if (this.levelUpFlash > 0) {
+      this.drawLevelUpFlash(cx, cy, w, h, this.levelUpNumber, this.levelUpFlash);
+    }
 
     if (state === 'gameover') {
       this.drawGameOver(cx, cy, w, h, score, highScore);
@@ -100,7 +114,7 @@ export class Renderer {
 
   private drawRing(ring: RingController, cx: number, cy: number, radius: number, width: number): void {
     const { ctx } = this;
-    const segCount = CONSTANTS.RING_SEGMENTS;
+    const segCount = ring.getSegments();
     const segAngle = (Math.PI * 2) / segCount;
     const gap = CONSTANTS.RING_GAP;
     const rotation = ring.getRotation();
@@ -150,7 +164,7 @@ export class Renderer {
     }
   }
 
-  private drawScore(score: number, combo: number, w: number): void {
+  private drawScore(score: number, combo: number, level: number, w: number): void {
     const { ctx } = this;
     ctx.save();
     ctx.fillStyle = '#FFFFFF';
@@ -162,6 +176,28 @@ export class Renderer {
       ctx.font = '18px "Courier New", monospace';
       ctx.fillText(`x${combo} COMBO`, w / 2, 74);
     }
+    ctx.fillStyle = '#45C8FF';
+    ctx.font = '16px "Courier New", monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(`LVL ${level}`, w - 16, 30);
+    ctx.restore();
+  }
+
+  private drawLevelUpFlash(cx: number, cy: number, w: number, h: number, level: number, remaining: number): void {
+    const { ctx } = this;
+    const alpha = Math.min(1, remaining / 300) * 0.55;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = '#45C8FF';
+    ctx.fillRect(0, 0, w, h);
+    ctx.globalAlpha = Math.min(1, remaining / 300);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 36px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = '#45C8FF';
+    ctx.fillText(`LEVEL ${level}`, cx, cy);
     ctx.restore();
   }
 
