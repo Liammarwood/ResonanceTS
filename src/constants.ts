@@ -10,7 +10,7 @@ export const CONSTANTS = {
     '#FF6B9D', '#00E5FF', '#B2FF59', '#FF6D00',
     '#EA80FC', '#00BFA5', '#FFD180', '#82B1FF',
   ],
-  RING_RADIUS_RATIO: 0.42,      // fraction of min(width, height) / 2
+  RING_RADIUS_RATIO: 0.9,       // fraction of min(width, height) / 2
   RING_WIDTH_RATIO: 0.06,       // fraction of ring radius
   PULSE_START_RADIUS: 20,
   PULSE_RADIUS: 10,
