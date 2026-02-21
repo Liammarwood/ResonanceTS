@@ -12,6 +12,9 @@
     "coverage": "vitest run --coverage"
   },
   "devDependencies": {
+    "@capacitor/android": "^7.5.0",
+    "@capacitor/cli": "^7.5.0",
+    "@capacitor/core": "^7.5.0",
     "@vitest/coverage-v8": "^4.0.18",
     "jsdom": "^26.1.0",
     "typescript": "~5.9.3",
