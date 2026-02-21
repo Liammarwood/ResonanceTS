@@ -1,3 +1,5 @@
+import { CONSTANTS } from './constants';
+
 export class Pulse {
   active: boolean = false;
   x: number = 0;
@@ -14,7 +16,7 @@ export class Pulse {
     this.color = color;
     this.speed = speed;
     this.distanceTraveled = 0;
-    this.radius = 10;
+    this.radius = CONSTANTS.PULSE_RADIUS;
   }
 
   deactivate(): void {
